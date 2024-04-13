@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'signup_screen.dart';
 import 'homepage.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,13 +19,12 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
-  late final String _selectedGender = '';
   bool passkey = true;
   late ProgressDialog _progressDialog;
 
   Future<void> login() async {
     print(_emailController.text);
-    print(_selectedGender);
+    print(_passController.text);
     _progressDialog.show();
 
     try {
@@ -34,14 +34,21 @@ class _LoginScreenState extends State<LoginScreen> {
               email: _emailController.text.trim(),
               password: _passController.text.trim());
       String? userid = userCredential.user?.uid;
+      _progressDialog.hide();
       if (userid != "") {
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const Homepage()),
         );
       }
-      _progressDialog.hide();
     } catch (e) {
+      Fluttertoast.showToast(
+        msg: 'Incorrect credentials',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
       _progressDialog.hide();
       print(e);
     }

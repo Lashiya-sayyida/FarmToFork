@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login_screen.dart';
+import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -30,6 +31,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   List<Map<String, dynamic>> district = [];
   List<Map<String, dynamic>> place = [];
   FirebaseFirestore db = FirebaseFirestore.instance;
+  late ProgressDialog _progressDialog;
 
   @override
   void initState() {
@@ -78,6 +80,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> _registerUser() async {
+    _progressDialog.show();
     try {
       UserCredential userCredential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -86,8 +89,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
       );
 
       await _storeUserData(userCredential.user!.uid);
+      _progressDialog.hide();
       Navigator.pop(context);
     } catch (e) {
+      _progressDialog.hide();
       print("Error registering user: $e");
     }
   }
