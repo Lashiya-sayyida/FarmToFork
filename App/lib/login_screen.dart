@@ -1,11 +1,14 @@
+// ignore_for_file: avoid_print, use_build_context_synchronously
+
 import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'signup_screen.dart';
 import 'homepage.dart';
+import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -13,14 +16,17 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passController = TextEditingController();
-  late String _selectedGender = '';
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passController = TextEditingController();
+  late final String _selectedGender = '';
   bool passkey = true;
+  late ProgressDialog _progressDialog;
 
   Future<void> login() async {
     print(_emailController.text);
     print(_selectedGender);
+    _progressDialog.show();
+
     try {
       final FirebaseAuth auth = FirebaseAuth.instance;
       final UserCredential userCredential =
@@ -31,10 +37,20 @@ class _LoginScreenState extends State<LoginScreen> {
       if (userid != "") {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Homepage()),
+          MaterialPageRoute(builder: (context) => const Homepage()),
         );
       }
-    } catch (e) {}
+      _progressDialog.hide();
+    } catch (e) {
+      _progressDialog.hide();
+      print(e);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _progressDialog = ProgressDialog(context);
   }
 
   @override
@@ -44,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
         children: [
           // Background Image
           Container(
-            constraints: BoxConstraints.expand(),
+            constraints: const BoxConstraints.expand(),
             child: Image.asset(
               'assets/92012.jpg',
               fit: BoxFit.cover,
@@ -83,16 +99,16 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           TextFormField(
-                            style: TextStyle(color: Colors.white),
+                            style: const TextStyle(color: Colors.white),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter Email';
                               }
                               return null;
                             },
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               filled: true,
                               fillColor: Colors.transparent,
                               hintText: 'Email',
@@ -111,9 +127,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             keyboardType: TextInputType.emailAddress,
                             controller: _emailController,
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           TextFormField(
-                            style: TextStyle(color: Colors.white),
+                            style: const TextStyle(color: Colors.white),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter Password';
@@ -124,15 +140,15 @@ class _LoginScreenState extends State<LoginScreen> {
                               filled: true,
                               fillColor: Colors.transparent,
                               hintText: 'Password',
-                              hintStyle: TextStyle(color: Colors.white),
+                              hintStyle: const TextStyle(color: Colors.white),
                               border: InputBorder.none,
-                              enabledBorder: UnderlineInputBorder(
+                              enabledBorder: const UnderlineInputBorder(
                                 borderSide: BorderSide(color: Colors.black),
                               ),
-                              focusedBorder: UnderlineInputBorder(
+                              focusedBorder: const UnderlineInputBorder(
                                 borderSide: BorderSide(color: Colors.white),
                               ),
-                              prefixIcon: Icon(Icons.lock, color: Colors.white),
+                              prefixIcon: const Icon(Icons.lock, color: Colors.white),
                               suffixIcon: InkWell(
                                 onTap: () {
                                   setState(() {
@@ -149,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             keyboardType: TextInputType.visiblePassword,
                             controller: _passController,
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           ElevatedButton(
                             onPressed: () async {
                               if (_formKey.currentState!.validate()) {
@@ -165,10 +181,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                   if (userid != "") {
                                     Navigator.pushReplacement(
                                       context,
-                                      MaterialPageRoute(builder: (context) => Homepage()),
+                                      MaterialPageRoute(builder: (context) => const Homepage()),
                                     );
                                   }
-                                } catch (e) {}
+                                } catch (e) {
+                                  print(e);
+                                }
                               }
                             },
                             style: ButtonStyle(
@@ -188,20 +206,20 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                             ),
-                            child: Text(
+                            child: const Text(
                               'Login',
                               style: TextStyle(color: Colors.white),
                             ),
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           TextButton(
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => SignUpScreen()),
+                                MaterialPageRoute(builder: (context) => const SignUpScreen()),
                               );
                             },
-                            child: Text(
+                            child: const Text(
                               'New User? Create Account',
                               style: TextStyle(color: Colors.white),
                             ),
@@ -221,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: LoginScreen(),
   ));
 }
