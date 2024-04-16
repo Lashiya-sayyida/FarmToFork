@@ -68,6 +68,7 @@ class _PaymentPageState extends State<PaymentPage> {
           );
         },
       );
+      Navigator.pop(context);
     } catch (e) {
       // Handle any errors that occur during the payment process
       print('Error submitting payment: $e');

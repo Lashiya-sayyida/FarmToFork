@@ -131,28 +131,36 @@ class _FarmerPageState extends State<FarmerPage> {
     }
   }
 
-  Future<int> getStock(String id, int? stock) async {
-    try {
-      QuerySnapshot<Map<String, dynamic>> cartSnapshot = await FirebaseFirestore
-          .instance
-          .collection('tbl_cart')
-          .where('product_id', isEqualTo: id)
-          .where('cart_status', isEqualTo: 1)
-          .get();
+  Future<int> getStock(String id, dynamic stock) async {
+  try {
+    QuerySnapshot<Map<String, dynamic>> cartSnapshot = await FirebaseFirestore
+        .instance
+        .collection('tbl_cart')
+        .where('product_id', isEqualTo: id)
+        .where('cart_status', isEqualTo: 1)
+        .get();
 
-      int totalStock = 0;
-      for (DocumentSnapshot<Map<String, dynamic>> doc in cartSnapshot.docs) {
-        int cartQty = doc['cart_qty'] ?? 0;
-        totalStock += cartQty;
-      }
-      int remainingStock = stock! - totalStock;
-
-      return remainingStock;
-    } catch (e) {
-      print('Error Getting Stock: $e');
-      return 0;
+    int totalStock = 0;
+    for (DocumentSnapshot<Map<String, dynamic>> doc in cartSnapshot.docs) {
+      int cartQty = doc['cart_qty'] ?? 0;
+      totalStock += cartQty;
     }
+
+    int remainingStock = 0;
+    if (stock is int) {
+      remainingStock = stock - totalStock;
+    } else if (stock is String) {
+      remainingStock = int.parse(stock) - totalStock;
+    } else {
+      print('Unknown stock data type: $stock');
+    }
+
+    return remainingStock;
+  } catch (e) {
+    print('Error Getting Stock: $e');
+    return 0;
   }
+}
 
   Future<void> addcart(String id) async {
     try {
@@ -409,7 +417,7 @@ class _FarmerPageState extends State<FarmerPage> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'Price: ${vegetable['vegetable_price'] ?? '0'}',
+                                  'Price: ${vegetable['vegetable_price'] is String ? double.parse(vegetable['vegetable_price']) : vegetable['vegetable_price']}',
                                   style: const TextStyle(
                                     fontSize: 14,
                                   ),

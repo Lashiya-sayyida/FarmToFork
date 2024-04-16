@@ -1,123 +1,148 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file/order_item.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class OrderScreen extends StatelessWidget {
+class OrderScreen extends StatefulWidget {
   const OrderScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 240, 233, 226), // Setting app bar color to green
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-        title: Text('My order'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.home),
-            onPressed: () {
-              // Navigate to home screen or perform any other action
-            },
-          ),
-        ],
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
+  _OrderScreenState createState() => _OrderScreenState();
+}
+
+class _OrderScreenState extends State<OrderScreen> {
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  List<Map<String, dynamic>> _bookingData = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBookingData();
+  }
+
+  Future<void> _fetchBookingData() async {
+  try {
+    final user = _auth.currentUser;
+    final userId = user?.uid;
+    if (userId != null) {
+      QuerySnapshot userSnapshot =
+          await _db.collection('tbl_user').where('uid', isEqualTo: userId).get();
+      if (userSnapshot.docs.isNotEmpty) {
+        String uDoc = userSnapshot.docs.first.id;
+
+        // Fetch all bookings for the current user
+        QuerySnapshot bookingSnapshot = await _db
+            .collection('tbl_booking')
+            .where('user_id', isEqualTo: uDoc)
+            .orderBy('booking_date', descending: true)
+            .get();
+
+        // Filter the bookings based on the booking status
+        List<Map<String, dynamic>> filteredBookings = [];
+        for (var doc in bookingSnapshot.docs) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          if (data['booking_status'] >= 1) {
+            data['id']=doc.id;
+            filteredBookings.add(data);
+          }
+        }
+
+        setState(() {
+          _bookingData = filteredBookings;
+        });
+      } else {
+        // Handle the case where there is no user document
+        print('No user document found');
+      }
+    } else {
+      // Handle the case where the user is not logged in
+      print('User is not logged in');
+    }
+  } catch (e) {
+    print('Error fetching booking data: $e');
+  }
+}
+
+  @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      // ... appbar code
+    ),
+    body: Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [Colors.lightGreen[200]!, Colors.lightGreen[800]!],
           ),
-        ),
-        child: ListView.builder(
-          itemCount: 3,
-          itemBuilder: (context, index) {
-            String date = '';
-            String id = '';
-            String supplier = '';
-            String imagePath = '';
-            String imageDetails = '';
-
-            // Assign different data for each card
-            if (index == 0) {
-              date = 'April 13, 2024';
-              id = '123456';
-              supplier = 'NatureBites';
-              imagePath = 'assets/626.jpg';
-              imageDetails = 'Brinjal\n 1\t\t*\t\t25\n amount=25';
-            } else if (index == 1) {
-              date = 'March 21, 2024';
-              id = '654321';
-              supplier = 'Ripple';
-              imagePath = 'assets/65075.jpg';
-              imageDetails ='Carrots\n 2\t\t*\t\t20\n amount=40';
-            } else if (index == 2) {
-              date = 'May 15, 2023';
-              id = '987654';
-              supplier = 'DEF farm';
-              imagePath = 'assets/tomatoes.jpg';
-              imageDetails = 'Tomato\n 3\t\t*\t\t30\n amount=90';
-            }
-
-            return Card(
-              margin: EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Order Date: $date',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Order ID: $id',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Supplier: $supplier',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        width: 150,
-                        height: 150,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage(imagePath),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 10), // Adding space between image and details
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            '$imageDetails',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
       ),
-    );
+      child: _bookingData.isEmpty
+          ? Center(
+              child: Text('No orders found'),
+            )
+          : ListView.builder(
+              itemCount: _bookingData.length,
+              itemBuilder: (context, index) {
+                final booking = _bookingData[index];
+                // DateTime bookingDate = DateTime.parse();
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: GestureDetector(
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => OrderItem(id: booking['id']),)) ;
+                    },
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Booking Date: ${booking['booking_date']}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16.0,
+                              ),
+                            ),
+                            SizedBox(height: 8.0),
+                            Text(
+                              'Booking Amount: Rs.${booking['booking_amount']}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16.0,
+                              ),
+                            ),
+                            SizedBox(height: 8.0),
+                            Text(
+                              'Booking Status: ${_getBookingStatus(booking['booking_status'])}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16.0,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+    ),
+  );
+}
+
+  String _getBookingStatus(int status) {
+    switch (status) {
+      case 1:
+        return 'Confirmed';
+      case 2:
+        return 'Completed';
+      default:
+        return 'Unknown';
+    }
   }
 }

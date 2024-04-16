@@ -471,10 +471,6 @@ class _HomepageState extends State<Homepage> {
             icon: Icon(Icons.assignment),
             label: 'Order',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment),
-            label: 'Search',
-          ),
         ],
         selectedItemColor: const Color.fromARGB(255, 243, 103, 61),
         unselectedItemColor: const Color.fromARGB(255, 243, 103, 61),
@@ -498,15 +494,6 @@ class _HomepageState extends State<Homepage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const OrderScreen(),
-                ),
-              );
-              break;
-            case 3:
-              // Navigate to order screen
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const Searchveg(),
                 ),
               );
               break;

@@ -65,7 +65,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background Image
           Container(
             constraints: const BoxConstraints.expand(),
             child: Image.asset(
@@ -126,10 +125,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(color: Colors.white),
-                             
-
                               ),
-                              prefixIcon: Icon(Icons.email, color: Colors.white),
+                              prefixIcon:
+                                  Icon(Icons.email, color: Colors.white),
                             ),
                             keyboardType: TextInputType.emailAddress,
                             controller: _emailController,
@@ -155,7 +153,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               focusedBorder: const UnderlineInputBorder(
                                 borderSide: BorderSide(color: Colors.white),
                               ),
-                              prefixIcon: const Icon(Icons.lock, color: Colors.white),
+                              prefixIcon:
+                                  const Icon(Icons.lock, color: Colors.white),
                               suffixIcon: InkWell(
                                 onTap: () {
                                   setState(() {
@@ -163,7 +162,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   });
                                 },
                                 child: Icon(
-                                  passkey ? Icons.visibility_off : Icons.visibility,
+                                  passkey
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
                                   color: Colors.white,
                                 ),
                               ),
@@ -178,7 +179,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               if (_formKey.currentState!.validate()) {
                                 login();
                                 try {
-                                  final FirebaseAuth auth = FirebaseAuth.instance;
+                                  final FirebaseAuth auth =
+                                      FirebaseAuth.instance;
                                   final UserCredential userCredential =
                                       await auth.signInWithEmailAndPassword(
                                     email: _emailController.text.trim(),
@@ -188,7 +190,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   if (userid != "") {
                                     Navigator.pushReplacement(
                                       context,
-                                      MaterialPageRoute(builder: (context) => const Homepage()),
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const Homepage()),
                                     );
                                   }
                                 } catch (e) {
@@ -197,17 +201,20 @@ class _LoginScreenState extends State<LoginScreen> {
                               }
                             },
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
                                 (Set<MaterialState> states) {
                                   if (states.contains(MaterialState.pressed)) {
                                     return Colors.blue.withOpacity(0.5);
-                                  } else if (states.contains(MaterialState.disabled)) {
+                                  } else if (states
+                                      .contains(MaterialState.disabled)) {
                                     return Colors.grey;
                                   }
                                   return Colors.blue;
                                 },
                               ),
-                              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -223,7 +230,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const SignUpScreen()),
+                                MaterialPageRoute(
+                                    builder: (context) => const SignUpScreen()),
                               );
                             },
                             child: const Text(

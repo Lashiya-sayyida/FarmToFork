@@ -63,7 +63,9 @@ class _SplashScreenState extends State<SplashScreen>
           ),
           // Apply blur effect using BackdropFilter
           BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 0, sigmaY: 0), // Adjust sigmaX and sigmaY for blur intensity
+            filter: ui.ImageFilter.blur(
+                sigmaX: 0,
+                sigmaY: 0), // Adjust sigmaX and sigmaY for blur intensity
             child: Container(
               color: Colors.black.withOpacity(0.3), // Adjust opacity as needed
               width: double.infinity,
@@ -78,24 +80,24 @@ class _SplashScreenState extends State<SplashScreen>
                       width: 100, // Adjust width as needed
                       height: 100, // Adjust height as needed
                     ),
-                  SizedBox(height: 20), // Add some spacing between logo and text
-FadeTransition(
-  opacity: _animation,
-  child: Text(
-    'FarmToFork',
-    style: TextStyle(
-      fontSize: 48, // Adjust font size
-      fontWeight: FontWeight.bold,
-      fontFamily: 'Pacifico', // Apply Pacifico font family
-      color: Colors.green, // Adjust text color
-    ),
-  ),
-),
+                    SizedBox(
+                        height: 20), // Add some spacing between logo and text
+                    FadeTransition(
+                      opacity: _animation,
+                      child: Text(
+                        'FarmToFork',
+                        style: TextStyle(
+                          fontSize: 48, // Adjust font size
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Pacifico', // Apply Pacifico font family
+                          color: Colors.green, // Adjust text color
+                        ),
+                      ),
+                    ),
 
-
-
-  
-                    SizedBox(height: 20), // Add some spacing between text and spinner loader
+                    SizedBox(
+                        height:
+                            20), // Add some spacing between text and spinner loader
                     CircularProgressIndicator(), // Add CircularProgressIndicator below the existing content
                   ],
                 ),
